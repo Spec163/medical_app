@@ -1,7 +1,8 @@
 package edu.tltsu.medical_app.medical_app.services;
 
-import edu.tltsu.medical_app.medical_app.dto.UserInfoDTO;
-import edu.tltsu.medical_app.medical_app.dto.UserManagerDTO;
+import java.util.List;
+import edu.tltsu.medical_app.medical_app.dto.user.UserInfoDTO;
+import edu.tltsu.medical_app.medical_app.dto.user.UserManagerDTO;
 import edu.tltsu.medical_app.medical_app.entities.UserEntity;
 import edu.tltsu.medical_app.medical_app.exceptions.UserEntityException;
 import edu.tltsu.medical_app.medical_app.repositories.UserEntityRepository;
@@ -22,7 +23,7 @@ public class UserEntityService {
   }
 
   @Transactional
-  public UserInfoDTO saveUser(final UserInfoDTO userInfoDTO) {
+  public UserEntity saveUser(final UserInfoDTO userInfoDTO) {
 
     if (this.userEntityRepository.existsByUsername(userInfoDTO.getUsername())) {
       throw new UserEntityException(userInfoDTO.getUsername());
@@ -40,20 +41,33 @@ public class UserEntityService {
         .build();
     this.userEntityRepository.save(userEntity);
 
-    return userInfoDTO;
+    return userEntity;
   }
 
   @Transactional
-  public void disableUserByUserId(final Long userId) {
+  public UserEntity disableUserByUserId(final Long userId) {
     final UserEntity userEntity = this.findUserEntityById(userId);
 
     userEntity.setIsActiveUser(false);
     this.userEntityRepository.save(userEntity);
     log.debug("User with ID = {} has been disabled!", userId);
+
+    return userEntity;
   }
 
   @Transactional
-  public UserInfoDTO changeUser(final Long userId, final UserInfoDTO userInfoDTO) {
+  public UserEntity enableUserByUserId(final Long userId) {
+    final UserEntity userEntity = this.findUserEntityById(userId);
+
+    userEntity.setIsActiveUser(true);
+    this.userEntityRepository.save(userEntity);
+    log.debug("User with ID = {} has been activated!", userId);
+
+    return userEntity;
+  }
+
+  @Transactional
+  public UserEntity changeUser(final Long userId, final UserInfoDTO userInfoDTO) {
     final UserEntity userEntity = this.findUserEntityById(userId);
 
     log.debug("Changing user data. Initial state: {}", userEntity);
@@ -68,12 +82,12 @@ public class UserEntityService {
 
     log.debug("User: {} has been changed.", userEntity);
 
-    return userInfoDTO;
+    return userEntity;
   }
 
   // admin/moderator operation
   @Transactional
-  public UserManagerDTO changeParent(final UserManagerDTO userManagerDTO) {
+  public UserEntity changeParent(final UserManagerDTO userManagerDTO) {
     final UserEntity userEntity = this.findUserEntityById(userManagerDTO.getParentId());
 
     if (this.userEntityRepository.existsByUserId(userManagerDTO.getParentId())) {
@@ -84,14 +98,39 @@ public class UserEntityService {
       log.error("Failed to change parentId = {} for user = {}!", userManagerDTO.getParentId(), userManagerDTO.getUserId());
       throw new UserEntityException(userManagerDTO.getParentId());
     }
-    return userManagerDTO;
+    return userEntity;
   }
 
-  private UserEntity findUserEntityById(final Long userId) {
+  public UserEntity findUserEntityById(final Long userId) {
     return this.userEntityRepository
         .findById(userId)
         .orElseThrow(() -> new UserEntityException(userId));
   }
 
-  // add Paging Implementation for GET
+  // admin/moderator
+  public UserEntity findUserEntityByUsername(final String username) {
+    return this.userEntityRepository
+        .findUserEntityByUsername(username)
+        .orElseThrow(() -> new UserEntityException(username));
+  }
+
+  // moderator/parent operation
+  public List<UserEntity> getUsersByParent(final Long parentId) {
+    return this.userEntityRepository.findUserEntitiesByParentId(parentId);
+  }
+
+  // admin/moderator
+  public List<UserEntity> findUserEntitiesByDepartmentId(final Long parentId) {
+    return this.userEntityRepository.findUserEntitiesByDepartmentId(parentId);
+  }
+
+  // admin
+  public List<UserEntity> getAllUsers() {
+    return this.userEntityRepository.findAll();
+  }
+
+  public UserEntity getUserByToken(final String token) {
+    // todo: security issue
+    return new UserEntity();
+  }
 }

@@ -1,4 +1,4 @@
-package edu.tltsu.medical_app.medical_app.dto;
+package edu.tltsu.medical_app.medical_app.dto.user;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

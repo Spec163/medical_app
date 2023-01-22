@@ -32,7 +32,7 @@ public class UserEntity {
   @Column(name = "parent_id", nullable = true)
   private Long parentId;
 
-  // foreign key
+  // todo: foreign key
   private Long departmentId;
 
   @Column(name = "job_title", nullable = false)
