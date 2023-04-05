@@ -130,7 +130,7 @@ public class UserEntityService {
   }
 
   public UserEntity getUserByToken(final String token) {
-    // todo: security issue
+    // todo: (Security 2) security issue
     return new UserEntity();
   }
 }

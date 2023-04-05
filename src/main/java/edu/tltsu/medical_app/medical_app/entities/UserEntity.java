@@ -32,7 +32,7 @@ public class UserEntity {
   @Column(name = "parent_id", nullable = true)
   private Long parentId;
 
-  // todo: foreign key
+  // todo: (Department) foreign key
   private Long departmentId;
 
   @Column(name = "job_title", nullable = false)
@@ -41,7 +41,7 @@ public class UserEntity {
   @Column(name = "is_active_user", nullable = false)
   private Boolean isActiveUser;
 
-  // TODO: mb foreign key to account table
+  // TODO: (Security 2) mb foreign key to account table
   @Column(name = "username", nullable = false, updatable = false, unique = true)
   private String username;
 
