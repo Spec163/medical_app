@@ -1,9 +1,11 @@
 package edu.tltsu.medical_app.medical_app.services;
 
 import java.util.Date;
+import java.util.List;
 import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.Schedule;
+import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
 import edu.tltsu.medical_app.medical_app.exceptions.DocumentPackageException;
 import edu.tltsu.medical_app.medical_app.exceptions.MeetingException;
 import edu.tltsu.medical_app.medical_app.exceptions.ScheduleException;
@@ -52,11 +54,51 @@ public class MeetingService {
   }
 
   public Meeting cancelMeeting(final Long meetingId, final Long userIdFromToken) {
-    final Meeting meeting = this.meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingException(meetingId));
+    final Meeting meeting = this.getMeetingById(meetingId);
+
     // TODO: (Security 1) meeting.userId == userIdFromToken OR userIdFromToken - manager for meeting.userId
+    if (!meeting.getUserId().equals(userIdFromToken) || !this.isManagerOrAdmin(meeting.getUserId(), userIdFromToken)) {
+      throw new AccessException(userIdFromToken, meetingId, Meeting.class);
+    }
     meeting.setStatus(MeetingStatuses.CANCELLED.getMeetingStatus());
     this.meetingRepository.save(meeting);
+
     return meeting;
+  }
+
+  public Meeting changeMeetingDate(final Long meetingId, final Long userIdFromToken, final MeetingDTO meetingDTO) {
+    final Meeting meeting = this.getMeetingById(meetingId);
+
+    // TODO: (Security 1) meeting.userId == userIdFromToken OR userIdFromToken - manager for meeting.userId
+    if (!meeting.getUserId().equals(userIdFromToken) || !this.isManagerOrAdmin(meeting.getUserId(), userIdFromToken)) {
+      throw new AccessException(userIdFromToken, meetingId, Meeting.class);
+    }
+
+    if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
+      throw new ScheduleException(meetingDTO.getDate());
+    }
+    meeting.setDate(meeting.getDate());
+    meeting.setStatus(MeetingStatuses.WAITING_FOR_APPROVE.getMeetingStatus());
+
+    return this.meetingRepository.save(meeting);
+  }
+
+  public Meeting getMeetingById(final Long meetingId) {
+    return this.meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingException(meetingId));
+  }
+
+  public List<Meeting> getAllUserMeetings(final Long userId) {
+    return this.meetingRepository.findMeetingsByUserId(userId);
+  }
+
+  public Meeting getActiveMeeting(final Long userId) {
+    return this.meetingRepository.findMeetingByUserIdAndStatus(userId, MeetingStatuses.ACCEPTED.getMeetingStatus())
+        .orElseThrow(() -> new MeetingException(userId, MeetingStatuses.ACCEPTED));
+  }
+
+  private boolean isManagerOrAdmin(final Long userId, final Long userIdFromToken) {
+    // TODO: (Security 1) check if userIdFromToken manager for userId
+    return Boolean.TRUE;
   }
 
   private void checkMeetingDTOInfo(final MeetingDTO meetingDTO) {
