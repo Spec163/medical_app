@@ -17,9 +17,6 @@ public class MeetingDTO {
   @Min(1L)
   private Long scheduleId;
 
-  @Min(1L)
-  private Long documentPackageId;
-
   @NotNull
   private Date date;
 

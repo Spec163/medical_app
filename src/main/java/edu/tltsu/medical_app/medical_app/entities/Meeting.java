@@ -37,10 +37,6 @@ public class Meeting {
   @Column(name = "schedule_id", nullable = false)
   private Long scheduleId;
 
-  // related to document package
-  // todo: (DocumentPackage) add @Column after complete document part of app
-  private Long documentPackageId;
-
   @Column(name = "date", nullable = false)
   private Date date;
 

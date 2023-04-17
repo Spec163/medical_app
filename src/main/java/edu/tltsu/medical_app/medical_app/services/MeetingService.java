@@ -6,7 +6,6 @@ import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.Schedule;
 import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
-import edu.tltsu.medical_app.medical_app.exceptions.DocumentPackageException;
 import edu.tltsu.medical_app.medical_app.exceptions.MeetingException;
 import edu.tltsu.medical_app.medical_app.exceptions.ScheduleException;
 import edu.tltsu.medical_app.medical_app.exceptions.UserEntityException;
@@ -44,7 +43,6 @@ public class MeetingService {
     final Meeting meeting = Meeting.builder()
         .userId(meetingDTO.getUserId())
         .scheduleId(meetingDTO.getScheduleId())
-        .documentPackageId(meetingDTO.getDocumentPackageId())
         .date(meetingDTO.getDate())
         .status(MeetingStatuses.WAITING_FOR_APPROVE.getMeetingStatus())
         .comment(meetingDTO.getComment())
@@ -108,10 +106,6 @@ public class MeetingService {
 
     if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
       throw new ScheduleException(meetingDTO.getDate());
-    }
-
-    if (!this.isExistingDocumentPackage(meetingDTO.getDocumentPackageId())) {
-      throw new DocumentPackageException(meetingDTO.getDocumentPackageId());
     }
   }
 
