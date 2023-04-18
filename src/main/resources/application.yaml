@@ -26,3 +26,6 @@ springdoc: # only for dev
   api-docs:
     path: /swagger-ui.html
   show-actuator: true
+
+jwt:
+  secret: spec
