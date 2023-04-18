@@ -41,9 +41,8 @@ public class UserEntity {
   @Column(name = "is_active_user", nullable = false)
   private Boolean isActiveUser;
 
-  // TODO: (Security 2) mb foreign key to account table
-  @Column(name = "username", nullable = false, updatable = false, unique = true)
-  private String username;
+  @Column(name = "accountId", nullable = false, unique = true)
+  private Long accountId;
 
   @Column(name = "name", nullable = false)
   private String name;
@@ -59,7 +58,7 @@ public class UserEntity {
       final Long parentId,
       final Long departmentId,
       final String jobTitle,
-      final String username,
+      final Long accountId,
       final String name,
       final String surname,
       final String patronymic
@@ -68,7 +67,7 @@ public class UserEntity {
     this.departmentId = departmentId;
     this.jobTitle = jobTitle;
     this.isActiveUser = true;
-    this.username = username;
+    this.accountId = accountId;
     this.name = name;
     this.surname = surname;
     this.patronymic = patronymic;

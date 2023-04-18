@@ -11,15 +11,13 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Long> {
 
   List<UserEntity> findUserEntitiesByNameAndSurnameAndPatronymic(String name, String surname, String patronymic);
 
-  Optional<UserEntity> findUserEntityByUsername(String username);
-
   List<UserEntity> findUserEntitiesByParentId(Long parentId);
 
   List<UserEntity> findUserEntitiesByDepartmentId(Long departmentId);
 
   Boolean existsByUserId(Long userId);
 
-  Boolean existsByUsername(String username);
+  Boolean existsByAccountId(Long accountId);
 
-
+  UserEntity findUserEntityByAccountId(Long accountId);
 }

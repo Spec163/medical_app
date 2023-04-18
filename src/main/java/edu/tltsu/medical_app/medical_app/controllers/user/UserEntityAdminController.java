@@ -35,11 +35,6 @@ public class UserEntityAdminController {
     return this.userEntityService.findUserEntityById(id);
   }
 
-  @GetMapping(value = "/username/{username}")
-  public UserEntity getUserById(@PathVariable("username") final String username) {
-    return this.userEntityService.findUserEntityByUsername(username);
-  }
-
   @GetMapping(value = "/departments/{departmentId}")
   public List<UserEntity> getUsersListByDepartmentId(@PathVariable("departmentId") final Long departmentId) {
     return this.userEntityService.findUserEntitiesByDepartmentId(departmentId);

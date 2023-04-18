@@ -25,8 +25,8 @@ public class UserEntityService {
   @Transactional
   public UserEntity saveUser(final UserInfoDTO userInfoDTO) {
 
-    if (this.userEntityRepository.existsByUsername(userInfoDTO.getUsername())) {
-      throw new UserEntityException(userInfoDTO.getUsername());
+    if (this.userEntityRepository.existsByAccountId(userInfoDTO.getAccountId())) {
+      throw new UserEntityException(userInfoDTO.getAccountId());
     }
 
     final UserEntity userEntity = UserEntity
@@ -34,7 +34,7 @@ public class UserEntityService {
         .parentId(userInfoDTO.getParentId())
         .departmentId(userInfoDTO.getDepartmentId())
         .jobTitle(userInfoDTO.getJobTitle())
-        .username(userInfoDTO.getUsername())
+        .accountId(userInfoDTO.getAccountId())
         .name(userInfoDTO.getName())
         .surname(userInfoDTO.getSurname())
         .patronymic(userInfoDTO.getPatronymic())
@@ -105,13 +105,6 @@ public class UserEntityService {
     return this.userEntityRepository
         .findById(userId)
         .orElseThrow(() -> new UserEntityException(userId));
-  }
-
-  // admin/moderator
-  public UserEntity findUserEntityByUsername(final String username) {
-    return this.userEntityRepository
-        .findUserEntityByUsername(username)
-        .orElseThrow(() -> new UserEntityException(username));
   }
 
   // moderator/parent operation

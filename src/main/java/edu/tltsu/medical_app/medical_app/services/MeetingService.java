@@ -5,6 +5,7 @@ import java.util.List;
 import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.Schedule;
+import edu.tltsu.medical_app.medical_app.entities.UserEntity;
 import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
 import edu.tltsu.medical_app.medical_app.exceptions.MeetingException;
 import edu.tltsu.medical_app.medical_app.exceptions.ScheduleException;
@@ -32,14 +33,15 @@ public class MeetingService {
     this.scheduleRepository = scheduleRepository;
   }
 
-  public Meeting createMeetingForUser(final MeetingDTO meetingDTO) {
-    // todo: (Security 1) проверка обычного юзера, meetingDTO.getUserId() == token.userId
-    return this.createMeeting(meetingDTO);
-  }
-
-  public Meeting createMeeting(final MeetingDTO meetingDTO) {
+  public Meeting createMeetingForUser(
+      final MeetingDTO meetingDTO,
+      final UserEntity user,
+      final boolean isAdmin
+  ) {
     this.checkMeetingDTOInfo(meetingDTO);
-
+    if (!meetingDTO.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meetingDTO.getUserId(), user.getUserId())) {
+      throw new AccessException(user.getUserId(), meetingDTO.getUserId());
+    }
     final Meeting meeting = Meeting.builder()
         .userId(meetingDTO.getUserId())
         .scheduleId(meetingDTO.getScheduleId())
@@ -51,25 +53,28 @@ public class MeetingService {
     return this.meetingRepository.save(meeting);
   }
 
-  public Meeting cancelMeeting(final Long meetingId, final Long userIdFromToken) {
+  public Meeting cancelMeeting(final Long meetingId, final UserEntity user, final boolean isAdmin) {
     final Meeting meeting = this.getMeetingById(meetingId);
 
-    // TODO: (Security 1) meeting.userId == userIdFromToken OR userIdFromToken - manager for meeting.userId
-    if (!meeting.getUserId().equals(userIdFromToken) || !this.isManagerOrAdmin(meeting.getUserId(), userIdFromToken)) {
-      throw new AccessException(userIdFromToken, meetingId, Meeting.class);
+    if (!meeting.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meeting.getUserId(), user.getUserId())) {
+      throw new AccessException(user.getUserId(), meetingId, Meeting.class);
     }
+
     meeting.setStatus(MeetingStatuses.CANCELLED.getMeetingStatus());
     this.meetingRepository.save(meeting);
 
     return meeting;
   }
 
-  public Meeting changeMeetingDate(final Long meetingId, final Long userIdFromToken, final MeetingDTO meetingDTO) {
+  public Meeting changeMeetingDate(
+      final Long meetingId,
+      final UserEntity user,
+      final MeetingDTO meetingDTO,
+      final boolean isAdmin
+  ) {
     final Meeting meeting = this.getMeetingById(meetingId);
-
-    // TODO: (Security 1) meeting.userId == userIdFromToken OR userIdFromToken - manager for meeting.userId
-    if (!meeting.getUserId().equals(userIdFromToken) || !this.isManagerOrAdmin(meeting.getUserId(), userIdFromToken)) {
-      throw new AccessException(userIdFromToken, meetingId, Meeting.class);
+    if (!meeting.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meeting.getUserId(), user.getUserId())) {
+      throw new AccessException(user.getUserId(), meetingId, Meeting.class);
     }
 
     if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
@@ -85,18 +90,19 @@ public class MeetingService {
     return this.meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingException(meetingId));
   }
 
-  public List<Meeting> getAllUserMeetings(final Long userId) {
-    return this.meetingRepository.findMeetingsByUserId(userId);
+  public List<Meeting> getAllUserMeetings(final UserEntity user) {
+    return this.meetingRepository.findMeetingsByUserId(user.getUserId());
   }
 
-  public Meeting getActiveMeeting(final Long userId) {
-    return this.meetingRepository.findMeetingByUserIdAndStatus(userId, MeetingStatuses.ACCEPTED.getMeetingStatus())
-        .orElseThrow(() -> new MeetingException(userId, MeetingStatuses.ACCEPTED));
+  public Meeting getActiveMeeting(final UserEntity user) {
+    return this.meetingRepository.findMeetingByUserIdAndStatus(user.getUserId(), MeetingStatuses.ACCEPTED.getMeetingStatus())
+        .orElseThrow(() -> new MeetingException(user.getUserId(), MeetingStatuses.ACCEPTED));
   }
 
-  private boolean isManagerOrAdmin(final Long userId, final Long userIdFromToken) {
-    // TODO: (Security 1) check if userIdFromToken manager for userId
-    return Boolean.TRUE;
+  private boolean isManager(final Long userId, final Long userIdFromToken) {
+    final UserEntity user = this.userEntityRepository.findById(userId).orElseThrow(() -> new UserEntityException(userId));
+    // TODO: Instead of `user.getParentId().equals(userIdFromToken)` check by hierarchy
+    return user.getParentId().equals(userIdFromToken);
   }
 
   private void checkMeetingDTOInfo(final MeetingDTO meetingDTO) {

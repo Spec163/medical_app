@@ -27,9 +27,8 @@ public class UserInfoDTO {
   @Size(min = 3, max = 120)
   private String jobTitle;
 
-  @NotBlank
-  @Size(min = 1, max = 60)
-  private String username;
+  @NotNull
+  private Long accountId;
 
   @NotBlank
   @Size(min = 1, max = 60)

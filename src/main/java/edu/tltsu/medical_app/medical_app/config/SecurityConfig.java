@@ -25,25 +25,9 @@ public class SecurityConfig {
     this.jwtFilter = jwtFilter;
   }
 
-//  @Override
-//  protected void configure(final HttpSecurity http) throws Exception {
-//    http
-//        .httpBasic().disable()
-//        .csrf().disable()
-//        //                .cors().disable()
-//        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        .and()
-//        .authorizeRequests()
-//        .antMatchers("/admin/*").hasRole("ADMIN")
-//        .antMatchers("/user/*").hasAnyRole("ADMIN", "USER")
-//        .antMatchers("/register", "/auth").permitAll()
-//        .and()
-//        .addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class);
-//  }
-
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
+    return http
         .httpBasic().disable()
         .csrf().disable()
         //                .cors().disable()
@@ -51,12 +35,12 @@ public class SecurityConfig {
         .and()
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers("/registration", "/auth").permitAll()
-//            .requestMatchers("/api/v1/admin/*").hasRole("ADMIN") // TODO: check permission collision
-            .requestMatchers("/api/v1/**").hasAnyRole("USER"))
-        .addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-    log.info("Check config...");
-    return http.build();
+            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/v1/manager/**").hasAnyRole("MANAGER", "ADMIN")
+            .requestMatchers("/api/v1/public/**").hasAnyRole("USER", "MANAGER", "ADMIN")
+        )
+        .addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
   }
 
   @Bean

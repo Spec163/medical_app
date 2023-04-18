@@ -35,7 +35,6 @@ public class JwtProvider {
     final Account account = this.accountRepository.findAccountByLogin(login);
     claims.put("login", account.getLogin()); // TODO: (Security 1) put accountId
     claims.put("accountId", account.getAccountId()); // TODO: (Security 1) put accountId
-    log.info("JWT secret == {}", jwtSecret);
     final String result = Jwts.builder()
         .setSubject(login)
         .setExpiration(date)
@@ -43,7 +42,7 @@ public class JwtProvider {
         .signWith(SignatureAlgorithm.HS512, this.jwtSecret)
         .addClaims(claims)
         .compact();
-    log.debug("created jwt = {}", result);
+
     return result;
   }
 
@@ -60,9 +59,5 @@ public class JwtProvider {
   String getLoginFromToken(final String token) {
     final Claims claims = Jwts.parser().setSigningKey(this.jwtSecret).parseClaimsJws(token).getBody();
     return claims.getSubject();
-  }
-
-  public Map<String, Object> getClaimsFromToken(final String token) {
-    return Jwts.parser().setSigningKey(this.jwtSecret).parseClaimsJws(token).getBody();
   }
 }
