@@ -16,7 +16,7 @@ import edu.tltsu.medical_app.medical_app.repositories.UserEntityRepository;
 import edu.tltsu.medical_app.medical_app.utils.MeetingStatuses;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service // TODO: Ддобавить ограничения для записи на конкретный день - не больше 50% сотрудников с конкретного отдела
 public class MeetingService {
 
   private final MeetingRepository meetingRepository;
