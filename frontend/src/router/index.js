@@ -1,17 +1,17 @@
-import store from '@/store/index'
-import {createRouter, createWebHistory} from "vue-router";
+import {createRouter, createWebHistory} from 'vue-router'
 import ProfilePage from "@/components/profile/ProfilePage";
 import LoginPage from "@/components/auth/LoginPage";
+// import store from '@/store/index'
 
 // проверка авторизации пользователя
-function checkAuth(to, from, next) {
-    if (store.getters.GET_USER_IS_ACTIVE) {
-        next()
-    } else {
-        console.warn('Вам необходимо авторизоваться!')
-        next('login')
-    }
-}
+// function checkAuth(to, from, next) {
+//   if (store.getters.GET_USER_IS_ACTIVE) {
+//     next()
+//   } else {
+//     console.warn('Вам необходимо авторизоваться!')
+//     next('login')
+//   }
+// }
 
 // проверка прав
 // function checkPrivilege(to, from, next) {
@@ -50,27 +50,26 @@ const routes = [
     // },
     {
         path: '/login',
-        name: 'login',
+        // name: 'login',
         component: LoginPage,
+        props: true,
         // beforeEnter(to, from, next) {
         //     checkNoAuth(to, from, next);
         // }
     },
     {
         path: '/profile',
-        name: 'profile',
+        // name: 'profile',
         component: ProfilePage,
-        beforeEnter(to, from, next) {
-            checkAuth(to, from, next);
-        }
+        // beforeEnter(to, from, next) {
+        //   checkAuth(to, from, next);
+        // }
     },
-];
-
+]
 
 const router = createRouter({
-    // mode: 'history',
-    routes,
-    history: createWebHistory(),
-});
+    history: createWebHistory(process.env.BASE_URL),
+    routes
+})
 
-export default router;
+export default router
