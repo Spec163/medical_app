@@ -1,14 +1,14 @@
 export default {
     GET_USER_ROLE(state) {
-        return state.initialState.user.role
+        return state.auth.user.role
     },
     IS_ADMIN_ROLE(state) {
-        return state.initialState.user.role === 'ROLE_ADMIN'
+        return state.auth.user.role === 'ROLE_ADMIN'
     },
     IS_MANAGER_ROLE(state) {
-        return state.initialState.user.role === 'ROLE_MANAGER'
+        return state.auth.user.role === 'ROLE_MANAGER'
     },
     GET_USER_IS_ACTIVE(state) {
-        return state.initialState.status.loggedIn
+        return state.auth.status.loggedIn
     },
 };
