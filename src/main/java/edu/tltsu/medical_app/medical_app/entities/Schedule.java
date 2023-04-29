@@ -37,6 +37,9 @@ public class Schedule {
   @ElementCollection
   private Set<Date> availableDates;
 
+//  private Integer minNumberOfPeople;
+  private Integer maxNumberOfPeople;
+
   // todo: (CLEAN_CODE) enum (ожидает подтверждения/подтверждено/пройдено/архив)
   @Column(name = "status", nullable = false)
   private String status;

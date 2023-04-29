@@ -39,7 +39,7 @@ public class MeetingService {
       final boolean isAdmin
   ) {
     this.checkMeetingDTOInfo(meetingDTO);
-    if (!meetingDTO.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meetingDTO.getUserId(), user.getUserId())) {
+    if (!(meetingDTO.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meetingDTO.getUserId(), user.getUserId()))) {
       throw new AccessException(user.getUserId(), meetingDTO.getUserId());
     }
     final Meeting meeting = Meeting.builder()
@@ -56,7 +56,7 @@ public class MeetingService {
   public Meeting cancelMeeting(final Long meetingId, final UserEntity user, final boolean isAdmin) {
     final Meeting meeting = this.getMeetingById(meetingId);
 
-    if (!meeting.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meeting.getUserId(), user.getUserId())) {
+    if (!(meeting.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meeting.getUserId(), user.getUserId()))) {
       throw new AccessException(user.getUserId(), meetingId, Meeting.class);
     }
 
@@ -73,7 +73,7 @@ public class MeetingService {
       final boolean isAdmin
   ) {
     final Meeting meeting = this.getMeetingById(meetingId);
-    if (!meeting.getUserId().equals(user.getUserId()) || !isAdmin || !this.isManager(meeting.getUserId(), user.getUserId())) {
+    if (!(meeting.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meeting.getUserId(), user.getUserId()))) {
       throw new AccessException(user.getUserId(), meetingId, Meeting.class);
     }
 

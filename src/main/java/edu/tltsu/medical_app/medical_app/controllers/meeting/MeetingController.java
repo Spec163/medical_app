@@ -4,6 +4,7 @@ import java.util.List;
 import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.UserEntity;
+import edu.tltsu.medical_app.medical_app.services.AutomaticDistributionService;
 import edu.tltsu.medical_app.medical_app.services.MeetingService;
 import edu.tltsu.medical_app.medical_app.utils.TokenParserUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,13 +27,16 @@ public class MeetingController {
 
   private final MeetingService meetingService;
   private final TokenParserUtils tokenParserUtils;
+  private final AutomaticDistributionService automaticDistributionService;
 
   public MeetingController(
       final MeetingService meetingService,
-      final TokenParserUtils tokenParserUtils
+      final TokenParserUtils tokenParserUtils,
+      final AutomaticDistributionService automaticDistributionService
   ) {
     this.meetingService = meetingService;
     this.tokenParserUtils = tokenParserUtils;
+    this.automaticDistributionService = automaticDistributionService;
   }
 
   @SneakyThrows
@@ -82,5 +86,12 @@ public class MeetingController {
     final UserEntity user = this.tokenParserUtils.getUsersByToken(request);
     return ResponseEntity.ok(this.meetingService.changeMeetingDate(
         meetingId, user, meetingDTO, this.tokenParserUtils.isAdmin(user.getAccountId())));
+  }
+
+  // todo: move to admin methods
+  @PutMapping(value = "/change/execute/{schedule}")
+  public ResponseEntity<String> executeAlgorithm(final @PathVariable("schedule") Long schedule) {
+    this.automaticDistributionService.executeAlgorithm(schedule);
+    return ResponseEntity.ok("Completed!");
   }
 }

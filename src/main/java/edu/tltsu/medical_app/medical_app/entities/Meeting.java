@@ -37,6 +37,7 @@ public class Meeting {
   @Column(name = "schedule_id", nullable = false)
   private Long scheduleId;
 
+
   @Column(name = "date", nullable = false)
   private Date date;
 
