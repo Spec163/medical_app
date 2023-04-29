@@ -1,6 +1,6 @@
 insert into role_entity values (1, 'ROLE_ADMIN') on conflict do nothing;
 insert into role_entity values (2, 'ROLE_MANAGER') on conflict do nothing;
-insert into role_entity values (3, 'ROLE_USER') on conflict do nothing;
+insert into role_entity values (3, 'ROLE_EMPLOYEE') on conflict do nothing;
 
 insert into user_entity (user_id, account_id, department_id, is_active_user, job_title, name, parent_id, patronymic, surname) values (201, 111, 50, true, 'teacher201', 'teacher201', 1, 'teacher201', 'teacher201');
 insert into user_entity (user_id, account_id, department_id, is_active_user, job_title, name, parent_id, patronymic, surname) values (202, 112, 50, true, 'teacher202', 'teacher202', 1, 'teacher202', 'teacher202');

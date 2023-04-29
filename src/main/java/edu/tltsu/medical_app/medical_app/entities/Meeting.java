@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "meeting")
@@ -30,14 +31,15 @@ public class Meeting {
   private Long meetingId;
 
   // related to user entity
-  @Column(name = "user_id", nullable = false)
-  private Long userId;
+  @Column(name = "employee_id", nullable = false)
+  private Long employeeId;
 
   // related to schedule
   @Column(name = "schedule_id", nullable = false)
   private Long scheduleId;
 
 
+  @DateTimeFormat(pattern = "yyyy-mm-dd")
   @Column(name = "date", nullable = false)
   private Date date;
 

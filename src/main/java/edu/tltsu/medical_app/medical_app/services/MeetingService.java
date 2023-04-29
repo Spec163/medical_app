@@ -3,16 +3,16 @@ package edu.tltsu.medical_app.medical_app.services;
 import java.util.Date;
 import java.util.List;
 import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
+import edu.tltsu.medical_app.medical_app.entities.Employee;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.Schedule;
-import edu.tltsu.medical_app.medical_app.entities.UserEntity;
 import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
 import edu.tltsu.medical_app.medical_app.exceptions.MeetingException;
 import edu.tltsu.medical_app.medical_app.exceptions.ScheduleException;
-import edu.tltsu.medical_app.medical_app.exceptions.UserEntityException;
+import edu.tltsu.medical_app.medical_app.exceptions.EmployeeException;
 import edu.tltsu.medical_app.medical_app.repositories.MeetingRepository;
 import edu.tltsu.medical_app.medical_app.repositories.ScheduleRepository;
-import edu.tltsu.medical_app.medical_app.repositories.UserEntityRepository;
+import edu.tltsu.medical_app.medical_app.repositories.EmployeeRepository;
 import edu.tltsu.medical_app.medical_app.utils.MeetingStatuses;
 import org.springframework.stereotype.Service;
 
@@ -20,30 +20,30 @@ import org.springframework.stereotype.Service;
 public class MeetingService {
 
   private final MeetingRepository meetingRepository;
-  private final UserEntityRepository userEntityRepository;
+  private final EmployeeRepository employeeRepository;
   private final ScheduleRepository scheduleRepository;
 
   public MeetingService(
       final MeetingRepository meetingRepository,
-      final UserEntityRepository userEntityRepository,
+      final EmployeeRepository employeeRepository,
       final ScheduleRepository scheduleRepository
   ) {
     this.meetingRepository = meetingRepository;
-    this.userEntityRepository = userEntityRepository;
+    this.employeeRepository = employeeRepository;
     this.scheduleRepository = scheduleRepository;
   }
 
-  public Meeting createMeetingForUser(
+  public Meeting createMeetingForEmployee(
       final MeetingDTO meetingDTO,
-      final UserEntity user,
+      final Employee employee,
       final boolean isAdmin
   ) {
     this.checkMeetingDTOInfo(meetingDTO);
-    if (!(meetingDTO.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meetingDTO.getUserId(), user.getUserId()))) {
-      throw new AccessException(user.getUserId(), meetingDTO.getUserId());
+    if (!(meetingDTO.getEmployeeId().equals(employee.getEmployeeId()) || isAdmin || this.isManager(meetingDTO.getEmployeeId(), employee.getEmployeeId()))) {
+      throw new AccessException(employee.getEmployeeId(), meetingDTO.getEmployeeId());
     }
     final Meeting meeting = Meeting.builder()
-        .userId(meetingDTO.getUserId())
+        .employeeId(meetingDTO.getEmployeeId())
         .scheduleId(meetingDTO.getScheduleId())
         .date(meetingDTO.getDate())
         .status(MeetingStatuses.WAITING_FOR_APPROVE.getMeetingStatus())
@@ -53,11 +53,11 @@ public class MeetingService {
     return this.meetingRepository.save(meeting);
   }
 
-  public Meeting cancelMeeting(final Long meetingId, final UserEntity user, final boolean isAdmin) {
+  public Meeting cancelMeeting(final Long meetingId, final Employee employee, final boolean isAdmin) {
     final Meeting meeting = this.getMeetingById(meetingId);
 
-    if (!(meeting.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meeting.getUserId(), user.getUserId()))) {
-      throw new AccessException(user.getUserId(), meetingId, Meeting.class);
+    if (!(meeting.getEmployeeId().equals(employee.getEmployeeId()) || isAdmin || this.isManager(meeting.getEmployeeId(), employee.getEmployeeId()))) {
+      throw new AccessException(employee.getEmployeeId(), meetingId, Meeting.class);
     }
 
     meeting.setStatus(MeetingStatuses.CANCELLED.getMeetingStatus());
@@ -68,13 +68,13 @@ public class MeetingService {
 
   public Meeting changeMeetingDate(
       final Long meetingId,
-      final UserEntity user,
+      final Employee employee,
       final MeetingDTO meetingDTO,
       final boolean isAdmin
   ) {
     final Meeting meeting = this.getMeetingById(meetingId);
-    if (!(meeting.getUserId().equals(user.getUserId()) || isAdmin || this.isManager(meeting.getUserId(), user.getUserId()))) {
-      throw new AccessException(user.getUserId(), meetingId, Meeting.class);
+    if (!(meeting.getEmployeeId().equals(employee.getEmployeeId()) || isAdmin || this.isManager(meeting.getEmployeeId(), employee.getEmployeeId()))) {
+      throw new AccessException(employee.getEmployeeId(), meetingId, Meeting.class);
     }
 
     if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
@@ -90,24 +90,24 @@ public class MeetingService {
     return this.meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingException(meetingId));
   }
 
-  public List<Meeting> getAllUserMeetings(final UserEntity user) {
-    return this.meetingRepository.findMeetingsByUserId(user.getUserId());
+  public List<Meeting> getAllEmployeeMeetings(final Employee employee) {
+    return this.meetingRepository.findMeetingsByEmployeeId(employee.getEmployeeId());
   }
 
-  public Meeting getActiveMeeting(final UserEntity user) {
-    return this.meetingRepository.findMeetingByUserIdAndStatus(user.getUserId(), MeetingStatuses.ACCEPTED.getMeetingStatus())
-        .orElseThrow(() -> new MeetingException(user.getUserId(), MeetingStatuses.ACCEPTED));
+  public Meeting getActiveMeeting(final Employee employee) {
+    return this.meetingRepository.findMeetingByEmployeeIdAndStatus(employee.getEmployeeId(), MeetingStatuses.ACCEPTED.getMeetingStatus())
+        .orElseThrow(() -> new MeetingException(employee.getEmployeeId(), MeetingStatuses.ACCEPTED));
   }
 
-  private boolean isManager(final Long userId, final Long userIdFromToken) {
-    final UserEntity user = this.userEntityRepository.findById(userId).orElseThrow(() -> new UserEntityException(userId));
-    // TODO: Instead of `user.getParentId().equals(userIdFromToken)` check by hierarchy
-    return user.getParentId().equals(userIdFromToken);
+  private boolean isManager(final Long employeeId, final Long employeeIdFromToken) {
+    final Employee employee = this.employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeException(employeeId));
+    // TODO: Instead of `employee.getParentId().equals(employeeIdFromToken)` check by hierarchy
+    return employee.getParentId().equals(employeeIdFromToken);
   }
 
   private void checkMeetingDTOInfo(final MeetingDTO meetingDTO) {
-    if (!this.isExistingUser(meetingDTO.getUserId())) {
-      throw new UserEntityException(meetingDTO.getUserId());
+    if (!this.isExistingEmployee(meetingDTO.getEmployeeId())) {
+      throw new EmployeeException(meetingDTO.getEmployeeId());
     }
 
     if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
@@ -115,13 +115,13 @@ public class MeetingService {
     }
   }
 
-  private boolean isExistingUser(final Long userId) {
-    return userEntityRepository.existsByUserId(userId);
+  private boolean isExistingEmployee(final Long employeeId) {
+    return employeeRepository.existsByEmployeeId(employeeId);
   }
 
   private boolean IsAvailableMeetingDate(final Date date, final Schedule schedule) {
     // todo: (Meeting) check date by schedule.availableDates
-    // todo: (Meeting) check number of users for date
+    // todo: (Meeting) check number of employees for date
     return Boolean.TRUE;
   }
 

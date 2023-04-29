@@ -8,11 +8,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-  List<Meeting> findMeetingsByUserIdAndStatus(Long userId, String status);
 
-  Optional<Meeting> findMeetingByUserIdAndStatus(Long userid, String status);
+  Optional<Meeting> findMeetingByEmployeeIdAndStatus(Long employeeId, String status);
 
-  List<Meeting> findMeetingsByUserId(Long userId);
+  List<Meeting> findMeetingsByEmployeeId(Long userId);
 
   List<Meeting> findMeetingsByScheduleId(Long scheduleId);
 }

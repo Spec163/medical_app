@@ -1,32 +1,34 @@
 package edu.tltsu.medical_app.medical_app.utils;
 
 import java.util.Map;
-import edu.tltsu.medical_app.medical_app.entities.UserEntity;
+import edu.tltsu.medical_app.medical_app.entities.Employee;
 import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
 import edu.tltsu.medical_app.medical_app.exceptions.AccountException;
 import edu.tltsu.medical_app.medical_app.repositories.AccountRepository;
-import edu.tltsu.medical_app.medical_app.repositories.UserEntityRepository;
+import edu.tltsu.medical_app.medical_app.repositories.EmployeeRepository;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 @Service
 public class TokenParserUtils {
 
   @Value("${jwt.secret}")
   private String jwtSecret;
 
-  private final UserEntityRepository userEntityRepository;
+  private final EmployeeRepository employeeRepository;
   private final AccountRepository accountRepository;
 
   public TokenParserUtils(
-      final UserEntityRepository userEntityRepository,
+      final EmployeeRepository employeeRepository,
       final AccountRepository accountRepository
   ) {
-    this.userEntityRepository = userEntityRepository;
+    this.employeeRepository = employeeRepository;
     this.accountRepository = accountRepository;
   }
 
@@ -42,16 +44,19 @@ public class TokenParserUtils {
     return null;
   }
 
-  public UserEntity getUsersByToken(final HttpServletRequest request) throws Exception {
+  public Employee getEmployeesByToken(final HttpServletRequest request) throws Exception {
     final Object accountIdFromToken =
         this.getClaimsFromToken(this.getTokenFromRequest(request)).get("accountId");
     if (accountIdFromToken == null) {
       throw new AccessException(request);
     }
-    final UserEntity user =
-        this.userEntityRepository.findUserEntityByAccountId(Long.parseLong(accountIdFromToken.toString()));
+    final Employee employee =
+        this.employeeRepository.findEmployeeByAccountId(Long.parseLong(accountIdFromToken.toString()));
 
-    return user;
+    if (employee == null) {
+      throw new AccessException(request);
+    }
+    return employee;
   }
 
   public boolean isAdmin(final Long accountId) {

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "schedule")
@@ -32,9 +33,14 @@ public class Schedule {
   @Column(name = "organization_id", nullable = false)
   private Long organizationId;
 
+  @DateTimeFormat(pattern = "yyyy-mm-dd")
   private Date startPeriod;
+
+  @DateTimeFormat(pattern = "yyyy-mm-dd")
   private Date endPeriod;
+
   @ElementCollection
+  @DateTimeFormat(pattern = "yyyy-mm-dd")
   private Set<Date> availableDates;
 
 //  private Integer minNumberOfPeople;

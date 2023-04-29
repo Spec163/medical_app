@@ -15,7 +15,7 @@ public class UserDetailsImpl implements UserDetails {
   private String password;
   private Collection<? extends GrantedAuthority> grantedAuthorities;
 
-  static UserDetailsImpl fromUserEntityToCustomUserDetails(final Account account) {
+  static UserDetailsImpl fromEmployeeToCustomUserDetails(final Account account) {
     final UserDetailsImpl customUserDetails = new UserDetailsImpl();
     customUserDetails.login = account.getLogin();
     customUserDetails.password = account.getPassword();

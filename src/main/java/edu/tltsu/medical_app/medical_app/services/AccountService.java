@@ -33,7 +33,7 @@ public class AccountService {
 
   @Deprecated
   public Account saveUser(final AccountDTO accountDTO) {
-    final RoleEntity role = this.roleEntityRepository.findRoleEntityByName("ROLE_USER");
+    final RoleEntity role = this.roleEntityRepository.findRoleEntityByName("ROLE_EMPLOYEE");
     final Account account = Account
         .builder()
         .roleEntity(role)

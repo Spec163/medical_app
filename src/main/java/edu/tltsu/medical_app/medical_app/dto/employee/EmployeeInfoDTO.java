@@ -1,4 +1,4 @@
-package edu.tltsu.medical_app.medical_app.dto.user;
+package edu.tltsu.medical_app.medical_app.dto.employee;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +15,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserInfoDTO {
+public class EmployeeInfoDTO {
 
   @Min(1L)
   private Long parentId;
