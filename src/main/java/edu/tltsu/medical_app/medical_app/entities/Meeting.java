@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,14 +36,9 @@ public class Meeting {
   @Column(name = "employee_id", nullable = false)
   private Long employeeId;
 
-  // related to schedule
-  @Column(name = "schedule_id", nullable = false)
-  private Long scheduleId;
-
-
-  @DateTimeFormat(pattern = "yyyy-mm-dd")
-  @Column(name = "date", nullable = false)
-  private Date date;
+  @ManyToOne
+  @JoinColumn(name = "available_date_id")
+  private AvailableDate availableDate;
 
   // todo: (CLEAN_CODE) enum (ожидает подтверждения/подтверждено/пройдено/архив)
   @Column(name = "status", nullable = false)

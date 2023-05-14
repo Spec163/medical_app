@@ -3,6 +3,7 @@ package edu.tltsu.medical_app.medical_app.services;
 import java.util.Date;
 import java.util.List;
 import edu.tltsu.medical_app.medical_app.dto.meeting.MeetingDTO;
+import edu.tltsu.medical_app.medical_app.entities.AvailableDate;
 import edu.tltsu.medical_app.medical_app.entities.Employee;
 import edu.tltsu.medical_app.medical_app.entities.Meeting;
 import edu.tltsu.medical_app.medical_app.entities.Schedule;
@@ -10,6 +11,7 @@ import edu.tltsu.medical_app.medical_app.exceptions.AccessException;
 import edu.tltsu.medical_app.medical_app.exceptions.MeetingException;
 import edu.tltsu.medical_app.medical_app.exceptions.ScheduleException;
 import edu.tltsu.medical_app.medical_app.exceptions.EmployeeException;
+import edu.tltsu.medical_app.medical_app.repositories.AvailableDateRepository;
 import edu.tltsu.medical_app.medical_app.repositories.MeetingRepository;
 import edu.tltsu.medical_app.medical_app.repositories.ScheduleRepository;
 import edu.tltsu.medical_app.medical_app.repositories.EmployeeRepository;
@@ -22,15 +24,18 @@ public class MeetingService {
   private final MeetingRepository meetingRepository;
   private final EmployeeRepository employeeRepository;
   private final ScheduleRepository scheduleRepository;
+  private final AvailableDateRepository availableDateRepository;
 
   public MeetingService(
       final MeetingRepository meetingRepository,
       final EmployeeRepository employeeRepository,
-      final ScheduleRepository scheduleRepository
+      final ScheduleRepository scheduleRepository,
+      final AvailableDateRepository availableDateRepository
   ) {
     this.meetingRepository = meetingRepository;
     this.employeeRepository = employeeRepository;
     this.scheduleRepository = scheduleRepository;
+    this.availableDateRepository = availableDateRepository;
   }
 
   public Meeting createMeetingForEmployee(
@@ -42,10 +47,13 @@ public class MeetingService {
     if (!(meetingDTO.getEmployeeId().equals(employee.getEmployeeId()) || isAdmin || this.isManager(meetingDTO.getEmployeeId(), employee.getEmployeeId()))) {
       throw new AccessException(employee.getEmployeeId(), meetingDTO.getEmployeeId());
     }
+
+    final AvailableDate availableDate = this.availableDateRepository.findById(meetingDTO.getAvailableDateId()).orElseThrow(); // todo: add axception
+    //todo: check: this date available for this employee?
+
     final Meeting meeting = Meeting.builder()
         .employeeId(meetingDTO.getEmployeeId())
-        .scheduleId(meetingDTO.getScheduleId())
-        .date(meetingDTO.getDate())
+        .availableDate(availableDate)
         .status(MeetingStatuses.WAITING_FOR_APPROVE.getMeetingStatus())
         .comment(meetingDTO.getComment())
         .build();
@@ -77,10 +85,10 @@ public class MeetingService {
       throw new AccessException(employee.getEmployeeId(), meetingId, Meeting.class);
     }
 
-    if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
-      throw new ScheduleException(meetingDTO.getDate());
-    }
-    meeting.setDate(meeting.getDate());
+    final AvailableDate availableDate = this.availableDateRepository.findById(meetingDTO.getAvailableDateId()).orElseThrow(); // todo: add axception
+    //todo: check: this date available for this employee?
+
+    meeting.setAvailableDate(availableDate);
     meeting.setStatus(MeetingStatuses.WAITING_FOR_APPROVE.getMeetingStatus());
 
     return this.meetingRepository.save(meeting);
@@ -108,10 +116,6 @@ public class MeetingService {
   private void checkMeetingDTOInfo(final MeetingDTO meetingDTO) {
     if (!this.isExistingEmployee(meetingDTO.getEmployeeId())) {
       throw new EmployeeException(meetingDTO.getEmployeeId());
-    }
-
-    if (!this.IsAvailableMeetingDate(meetingDTO.getDate(), this.getExistingSchedule(meetingDTO.getScheduleId()))) {
-      throw new ScheduleException(meetingDTO.getDate());
     }
   }
 

@@ -34,35 +34,5 @@ public class AutomaticDistributionService {
 
   public void executeAlgorithm(final Long scheduleId) {
     final Schedule schedule = this.scheduleRepository.findById(scheduleId).orElseThrow(/* todo: throw error */);
-    final List<Meeting> meetings = this.meetingRepository.findMeetingsByScheduleId(scheduleId);
-
-    final List<Date> reservedDates = new ArrayList<>();
-    meetings.forEach(meeting -> reservedDates.add(meeting.getDate()));
-
-    log.info("reservedDates: {}", reservedDates);
-
-    final List<Long> scheduledEmployees = new ArrayList<>();
-    meetings.forEach(meeting -> scheduledEmployees.add(meeting.getEmployeeId()));
-
-    log.info("scheduledUsers: {}", scheduledEmployees);
-
-    final List<Employee> users = this.employeeRepository.findByEmployeeIdNotIn(scheduledEmployees);
-
-    final Map<Date, Integer> scheduleDates = new HashMap<>();
-    schedule.getAvailableDates()
-        .forEach(s -> scheduleDates.put(s, 0));
-
-    log.info("Initiate scheduleDates: {}", scheduleDates);
-
-    reservedDates.forEach(
-        r -> {
-          if (scheduleDates.containsKey(r)) {
-            scheduleDates.put(r, scheduleDates.get(r) + 1);
-          }
-        }
-    );
-    log.info("After reserved scheduleDates: {}", scheduleDates);
-
-
   }
 }

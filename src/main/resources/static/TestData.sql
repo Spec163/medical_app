@@ -19,12 +19,12 @@ insert into user_entity (user_id, account_id, department_id, is_active_user, job
 insert into schedule (schedule_id, comment, end_period, organization_id, start_period, status, max_number_of_people) VALUES (301, null, '2023-05-25', 1, '2023-04-25', 'ACTIVE', 5);
 insert into schedule (schedule_id, comment, end_period, organization_id, start_period, status, max_number_of_people) VALUES (302, null, '2023-07-27', 1, '2023-06-27', 'ACTIVE', 7);
 
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-01');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-02');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-03');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-04');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-05');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-10');
-INSERT INTO public.schedule_available_dates (schedule_schedule_id, available_dates) VALUES (302, '2023-07-11');
+insert into available_date (available_date_id, date, count, schedule_id) values (35, '2023-04-25', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (36, '2023-04-26', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (37, '2023-04-27', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (38, '2023-04-28', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (39, '2023-04-29', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (40, '2023-04-30', 0, 301);
+insert into available_date (available_date_id, date, count, schedule_id) values (41, '2023-01-01', 0, 301);
 
 insert into meeting (meeting_id, comment, date, schedule_id, status, user_id) values (421, null, '2023-07-11', 302, 'WAITING_FOR_APPROVE', 202);
