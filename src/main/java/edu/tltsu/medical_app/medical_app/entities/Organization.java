@@ -13,20 +13,27 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "department")
+@Table(name = "organization")
 @Getter
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Department {
+public class Organization {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "department_id", nullable = false)
-  private Long departmentId;
+  private Long organizationId;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
+  private String address;
+
+  @Column(nullable = false)
   private String name;
 
-  private String description;
+  @Column(nullable = false)
+  private String status;
+
+  @Column(nullable = false)
+  private String phoneNumber;
 }
