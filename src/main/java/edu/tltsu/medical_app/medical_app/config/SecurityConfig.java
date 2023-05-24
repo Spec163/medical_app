@@ -35,7 +35,7 @@ public class SecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers("/registration", "/auth").permitAll()
+            .requestMatchers("/registration", "/auth", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-ui.html/**").permitAll()
             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/v1/manager/**").hasAnyRole("MANAGER", "ADMIN")
             .requestMatchers("/api/v1/public/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
@@ -44,12 +44,6 @@ public class SecurityConfig {
         .build();
   }
 
-//  @Bean
-//  public WebSecurityCustomizer webSecurityCustomizer() {
-//    return (web) -> web
-////        .debug(true) // todo: move true to property variable (like https://github.com/eugenp/tutorials/blob/master/spring-security-modules/spring-security-web-boot-4/src/main/java/com/baeldung/securityfilterchain/configuration/SecurityConfig.java)
-//        .ignoring().requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html");
-//  }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
