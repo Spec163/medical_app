@@ -8,7 +8,8 @@ const state = () => ({
     initialState: user
         ? {status: {loggedIn: true}, user}
         : {status: {loggedIn: false}, user: null},
-    profile: {},
+    employee: {},
+    activeMeeting: {},
     users: [],
     meetings: []
 })

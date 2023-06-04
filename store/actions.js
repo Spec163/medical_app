@@ -1,4 +1,5 @@
 import AuthService from "~/services/auth-service";
+import ProfileService from "~/services/profile-service";
 
 export default {
     LOGIN({commit}, user) {
@@ -18,5 +19,33 @@ export default {
     LOGOUT({commit}) {
         AuthService.logout();
         commit('LOGOUT');
+    },
+
+    SET_EMPLOYEE_INFO({commit}) {
+        ProfileService.getEmployeeInfo().then(
+            employee => {
+                commit('SET_EMPLOYEE_INFO_MUTATION', employee);
+                // return Promise.resolve(employee);
+                return employee;
+            },
+            error => {
+                // return Promise.reject(error);
+                return error;
+            }
+        );
+    },
+
+    SET_ACTIVE_MEETING({commit}) {
+        ProfileService.getActiveMeeting().then(
+            meeting => {
+                commit('SET_ACTIVE_MEETING_MUTATION', meeting);
+                // return Promise.resolve(meeting);
+                return meeting;
+            },
+            error => {
+                // return Promise.reject(error);
+                return error;
+            }
+        );
     },
 }
